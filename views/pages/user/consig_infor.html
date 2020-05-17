@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>会员信息</title>
+<link type="text/css" rel="stylesheet" href="/views/static/css/style.css" >
+<style type="text/css">
+	.login_form{
+		height:420px;
+		margin-top: 25px;
+	}
+	
+</style>
+	<script src="/views/static/script/jquery-1.7.2.js"></script>
+<script>
+	alert("完善收件人信息才能购买商品哟")
+	$(function(){
+		//给注册按钮绑定单击事件
+		$("#sub_btn").click(function(){
+			//获取用户输入的密码
+			var password = $("#password").val();
+			//设置验证密码的正则表达式
+			if(password != ""){
+				var passwordReg = /^[a-zA-Z0-9_-]{6,18}$/;
+				if(!passwordReg.test(password)){
+					alert("请输入6-18位的字母、数字、下划线或减号的密码！")
+					return false;
+				}
+			}else{
+				return true
+			}
+
+			//获取用户输入的确认密码
+			var repwd = $("#repwd").val();
+			if(repwd != ""){
+				//判断两次输入的密码是否一致
+				if(repwd != password){
+					//将确认密码清空，即将确认密码密码框中的value属性设置为空
+					$("#repwd").val("");
+					alert("两次输入的密码不一致！");
+					return false;
+				}
+				return true;
+			}else{
+				return true
+			}
+
+			//获取用户输入的邮箱
+			var email = $("#email").val();
+			//设置验证邮箱的正则表达式
+			var emailReg = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+			if(!emailReg.test(email)){
+				alert("邮箱格式不正确！");
+				return false;
+			}
+
+		});
+		//将显示错误提示信息的span标签隐藏
+		$("#msg").hide();
+		if("{{.}}"=="用户名已存在！"){
+			$("#msg").show();
+		}
+
+		//发送Ajax请求验证用户名是否存在
+		//给输入用户名的文本框绑定change事件
+		$("#username").change(function(){
+			//获取用户输入的用户名
+			var username = $(this).val();
+			//设置请求地址
+			var url = "/checkUserName";
+			//设置请求参数
+			var param = {"username":username};
+			//发送Ajax请求
+			$.post(url,param,function(res){
+				//将显示提示信息的span元素显示
+				$("#msg").show();
+				//将响应信息设置到span元素中
+				$("#msg").html(res);
+			});
+		});
+	});
+</script>
+
+</head>
+<body>
+
+
+		<div id="login_header">
+			<img class="logo_img" alt="" src="/views/static/img/logo.gif" >
+			<div>
+				<br>
+				<a href="/">返回</a>&nbsp;
+			</div>
+		</div>
+			<div class="login_banner">
+			
+				<div id="l_content">
+					<span class="login_word">用户信息</span>
+				</div>
+				
+				<div id="content">
+					<div class="login_form">
+						<div class="login_mass">
+							<div class="form">
+								<form action="/modifyconsiginfor" method="post">
+									<br />
+									<label>收件人姓名：</label>
+									<br />
+									<input class="itxt" type="text" {{if .ExistConsigName}} placeholder="{{.ConsigName}}" {{else}} placeholder="请完善收件人姓名" {{end}} autocomplete="off" tabindex="1" name="consigname" id="consigname" />
+									<br />
+									<br />
+									<label>收件人电话：</label>
+									<br />
+									<input class="itxt" type="text" {{if .ExistConsigTel}} placeholder="{{.ConsigTel}}" {{else}} placeholder="请完善收件人电话" {{end}} autocomplete="off" tabindex="1" name="consigtel" id="consigtel" />
+									<br />
+									<br />
+									<label>默认地址：</label>
+									<br />
+									<input class="itxt" type="text" {{if .ExistConsigAdd}} placeholder="{{.ConsigAdd}}" {{else}} placeholder="请完善收货地址信息" {{end}} autocomplete="off" tabindex="1" name="consigadd" id="consigadd" />
+									<br />
+									<br />
+									<label>电子邮件：</label>
+									<br />
+									<input class="itxt" type="text" {{if .ExistEmail}} placeholder="{{.Email}}" {{else}} placeholder="请完善邮箱信息" {{end}} autocomplete="off" tabindex="1" name="email" id="email" />
+									<br />
+									<br/>
+									<label>用户密码：</label>
+									<br/>
+									<input class="itxt" type="password" placeholder="请输入修改的密码" autocomplete="off" tabindex="1" name="password" id="password" />
+									<br />
+									<br>
+									<label>确认密码：</label>
+									<br/>
+									<input class="itxt" type="password" placeholder="确认修改的密码" autocomplete="off" tabindex="1" name="repwd" id="repwd" />
+									<br />
+									<br/>
+									<input type="submit" value="保存" id="sub_btn" />
+								</form>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		<div id="bottom">
+			<span>
+				小黄和小白de书店.Copyright &copy;2019
+			</span>
+		</div>
+</body>
+</html>

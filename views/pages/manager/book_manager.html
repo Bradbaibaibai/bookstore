@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>图书管理</title>
+<link type="text/css" rel="stylesheet" href="/views/static/css/style.css" >
+
+	<script src="/views/static/script/jquery-1.7.2.js"></script>
+	<script>
+		$(function(){
+			$(".deletebook").click(function(){
+				var title = $(this).attr("id");
+				return confirm("确定要删除【"+title+"】这本图书吗？");
+			});
+		});
+	</script>
+
+</head>
+<body>
+	
+	<div id="header">
+			<img class="logo_img" alt="" src="/views/static/img/logo.gif" >
+			<div>
+				<a href="/">返回商城</a>
+			</div>
+	</div>
+	
+	<div id="main">
+		<table>
+			<tr>
+				<td>名称</td>
+				<td>价格</td>
+				<td>作者</td>
+				<td>销量</td>
+				<td>库存</td>
+				<td colspan="2">操作</td>
+			</tr>
+
+			{{range .Books}}
+				<tr>
+					<td>{{.Title}}</td>
+					<td>{{.Price}}</td>
+					<td>{{.Author}}</td>
+					<td>{{.Sales}}</td>
+					<td>{{.Stock}}</td>
+					<td><a href="/updatebook?bookId={{.ID}}">修改</a></td>
+					<td><a id="{{.Title}}" class="deletebook" href="/deletebook?bookId={{.ID}}">删除</a></td>
+				</tr>
+			{{end}}
+			
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td><a href="/views/pages/manager/book_edit.html">添加图书</a></td>
+			</tr>	
+		</table>
+
+		<div id="page_nav">
+			<a href="/getpagebooks?pageNo=1">首页</a>
+			<a href="/getpagebooks?pageNo={{.GetLastPageNo}}">上一页</a>
+			<a href="/getpagebooks?pageNo={{.GetNextPageNo}}">下一页</a>
+			<a href="/getpagebooks?pageNo={{.TotalPageNo}}">末页</a>
+			<br>
+			当前是第{{.PageNo}}页，共{{.TotalPageNo}}页，共{{.TotalRecord}}条记录
+			<br>
+			到第<input value="" name="pn" id="pn_input"/>页
+			<input type="button" value="确定" id="sub">
+			<script>
+				$("#sub").click(function () {
+					var pageNo = $("#pn_input").val();
+					location = "/getpagebooks?pageNo="+pageNo
+				});
+			</script>
+		</div>
+
+	</div>
+	
+	<div id="bottom">
+		<span>
+			小黄和小白de书店.Copyright &copy;2019
+		</span>
+	</div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>会员注册页面</title>
+<link type="text/css" rel="stylesheet" href="/views/static/css/style.css" >
+<style type="text/css">
+	h1 {
+		text-align: center;
+		margin-top: 200px;
+	}
+	
+	h1 a {
+		color:red;
+	}
+</style>
+</head>
+<body>
+
+		<div id="header">
+			<img class="logo_img" alt="" src="/views/static/img/logo.gif" >
+			<div>
+				<br>
+				<a href="/logout">注销</a>&nbsp;
+			</div>
+		</div>
+
+		<div id="main">
+
+			<h1>welcome back<span class="um_span">{{.}},</span> <br>
+				Regist Successfully.
+			</h1>
+			<br>
+			<a href="/">转到主页</a>
+
+		</div>
+
+		<div id="bottom">
+			<span>
+				小黄和小白de书店.Copyright &copy;2019
+			</span>
+		</div>
+</body>
+</html>

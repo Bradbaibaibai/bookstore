@@ -21,6 +21,7 @@ func IndexHandler(w http.ResponseWriter,r *http.Request){
 			}
 		}
 	}
+
 	t.Execute(w,page)
 }
 

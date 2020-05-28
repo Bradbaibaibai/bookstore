@@ -68,6 +68,8 @@ func GetPageBooks(w http.ResponseWriter,r *http.Request){
 	t.Execute(w,page)
 }
 
+
+//图书获取的主调函数
 func GetPageBooksByPrice(w http.ResponseWriter,r  *http.Request){
 
 	pageNo := r.FormValue("pageNo")

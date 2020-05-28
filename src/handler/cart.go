@@ -72,6 +72,8 @@ func CartHandler(w http.ResponseWriter,r *http.Request){
 		}else{
 			choose := r.PostFormValue("submit")
 			if choose == "结算"{
+				//重写
+
 				username := s.UserName
 				r.ParseForm()
 				mp := r.PostForm
@@ -97,9 +99,11 @@ func CartHandler(w http.ResponseWriter,r *http.Request){
 							t.Execute(w,waitPayHtml)
 						}
 					}
+
 				}else{
 					CartHandler(w,r)
 				}
+
 			}else if choose == "删除"{
 				username := s.UserName
 				r.ParseForm()

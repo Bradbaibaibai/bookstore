@@ -20,8 +20,10 @@ func CheckOut(w http.ResponseWriter,r *http.Request){
 		}else{
 			existConsigInfor := dao.GetConsigHtml(s.UserName)
 			if existConsigInfor.ConsigName != "" && existConsigInfor.ConsigAdd != "" && existConsigInfor.ConsigTel != ""{
+				//将下单信息先放入消息队列
 
-				wpay,_ := dao.GetWaitPay(s.UserName)
+
+				wpay,_ := dao.GetWaitPay(s.UserName) //对GetWaitPay重写，改为消息队列！
 				mpays := make([]*model.MyPay,0)
 				for _,v := range wpay{
 					tmp := &model.MyPay{}
@@ -36,6 +38,7 @@ func CheckOut(w http.ResponseWriter,r *http.Request){
 					tmp.PayID = v.PayID
 					mpays = append(mpays,tmp)
 				}
+				//下单成功后的数据库减库存与添加至订单列表操作
 				err = dao.BookStockJn(mpays)
 				if err != nil{
 					t := template.Must(template.ParseFiles("views/pages/pay/checkoutfail.html"))
@@ -46,11 +49,21 @@ func CheckOut(w http.ResponseWriter,r *http.Request){
 						t := template.Must(template.ParseFiles("views/pages/pay/checkoutfail.html"))
 						t.Execute(w,r)
 					}else{
-						dao.DelWaitPay(s.UserName)
-						t := template.Must(template.ParseFiles("views/pages/pay/checkout.html"))
-						t.Execute(w,r)
+						wPays,err := dao.GetWaitPay(s.UserName)
+						if err != nil{
+							t := template.Must(template.ParseFiles("views/pages/pay/checkoutfail.html"))
+							t.Execute(w,r)
+						}else{
+							for _,v := range wPays{
+								dao.DelCart(s.UserName,v.BookID)
+							}
+							dao.DelWaitPay(s.UserName)
+							t := template.Must(template.ParseFiles("views/pages/pay/checkout.html"))
+							t.Execute(w,r)
+						}
 					}
 				}
+
 			}else{
 				dao.DelWaitPay(s.UserName)
 				ConsigInfor(w,r)

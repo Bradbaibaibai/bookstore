@@ -18,7 +18,7 @@ import (
     consigname varchar(100) not null
 */
 
-func Addpayed(mpays []*model.MyPay) error {
+func Addpayed(mpays []model.MyPay) error {
 	sqlStr := "insert into payed values(?,?,?,?,?,?,?,?,?)"
 	for _,v := range mpays{
 		_,err := utils.Db.Exec(sqlStr,v.PayID,v.BookID,v.BookName,v.UserName,v.Num,v.Price,v.ConsigAdd,v.ConsigTel,v.ConsigName)
@@ -29,7 +29,7 @@ func Addpayed(mpays []*model.MyPay) error {
 	return nil
 }
 
-func BookStockJn(mpays []*model.MyPay)error{
+func BookStockJn(mpays []model.MyPay)error{
 	//先对书的库存加锁再减,对mpays也要加锁
 	var nums []int
 	for _,v := range mpays{

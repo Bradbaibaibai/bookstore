@@ -51,5 +51,6 @@ func main(){
 	*/
 	http.Handle("/views/static/",http.StripPrefix("/views/static/",http.FileServer(http.Dir("views/static/"))))
 	http.Handle("/views/pages/",http.StripPrefix("/views/pages/",http.FileServer(http.Dir("views/pages/"))))
+	go dao.GetStockJnMQ()
 	http.ListenAndServe("localhost:5432",nil)
 }

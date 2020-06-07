@@ -13,20 +13,17 @@ func CheckOut(w http.ResponseWriter,r *http.Request){
 	cookie,err := r.Cookie("Session")
 	if err != nil{
 		LoginHandler(w,r)
-	}else{
-		s,err := dao.GetSession(cookie.Value)
-		if err != nil{
-			LoginHandler(w,r)
-		}else{
+	}else {
+		s, err := dao.GetSession(cookie.Value)
+		if err != nil {
+			LoginHandler(w, r)
+		} else {
 			existConsigInfor := dao.GetConsigHtml(s.UserName)
-			if existConsigInfor.ConsigName != "" && existConsigInfor.ConsigAdd != "" && existConsigInfor.ConsigTel != ""{
-				//将下单信息先放入消息队列
-
-
-				wpay,_ := dao.GetWaitPay(s.UserName) //对GetWaitPay重写，改为消息队列！
-				mpays := make([]*model.MyPay,0)
-				for _,v := range wpay{
-					tmp := &model.MyPay{}
+			if existConsigInfor.ConsigName != "" && existConsigInfor.ConsigAdd != "" && existConsigInfor.ConsigTel != "" {
+				wpay, _ := dao.GetWaitPay(s.UserName)
+				mpays := make([]model.MyPay, 0)
+				for _, v := range wpay {
+					tmp := model.MyPay{}
 					tmp.UserName = s.UserName
 					tmp.ConsigTel = existConsigInfor.ConsigTel
 					tmp.ConsigAdd = existConsigInfor.ConsigAdd
@@ -36,39 +33,37 @@ func CheckOut(w http.ResponseWriter,r *http.Request){
 					tmp.Price = v.Price
 					tmp.BookID = v.BookID
 					tmp.PayID = v.PayID
-					mpays = append(mpays,tmp)
+					mpays = append(mpays, tmp)
 				}
 				//下单成功后的数据库减库存与添加至订单列表操作
-				err = dao.BookStockJn(mpays)
-				if err != nil{
-					t := template.Must(template.ParseFiles("views/pages/pay/checkoutfail.html"))
-					t.Execute(w,r)
-				}else{
+				err = dao.InsertStockJnMQ(mpays)   //减库存交给消息队列处理
+				if err != nil {
+					CheckOut(w, r)
+				} else {
 					err = dao.Addpayed(mpays)
-					if err != nil{
+					if err != nil {
 						t := template.Must(template.ParseFiles("views/pages/pay/checkoutfail.html"))
-						t.Execute(w,r)
-					}else{
-						wPays,err := dao.GetWaitPay(s.UserName)
-						if err != nil{
+						t.Execute(w, r)
+					} else {
+						wPays, err := dao.GetWaitPay(s.UserName)
+						if err != nil {
 							t := template.Must(template.ParseFiles("views/pages/pay/checkoutfail.html"))
-							t.Execute(w,r)
-						}else{
-							for _,v := range wPays{
-								dao.DelCart(s.UserName,v.BookID)
+							t.Execute(w, r)
+						} else {
+							for _, v := range wPays {
+								dao.DelCart(s.UserName, v.BookID)
 							}
-							dao.DelWaitPay(s.UserName)
-							t := template.Must(template.ParseFiles("views/pages/pay/checkout.html"))
-							t.Execute(w,r)
 						}
+						dao.DelWaitPay(s.UserName)
+						t := template.Must(template.ParseFiles("views/pages/pay/checkout.html"))
+						t.Execute(w, r)
 					}
 				}
-
-			}else{
+			} else {
 				dao.DelWaitPay(s.UserName)
-				ConsigInfor(w,r)
+				ConsigInfor(w, r)
 			}
-
 		}
+
 	}
 }
